@@ -67,3 +67,21 @@ def get_offres(limite_basse, limite_haute, job_list):
         job_data = parse_job_details(html_content)
         job_list.extend(job_data)
     return job_list# Use extend to add elements to an existing list    return job_list
+
+def fetch_job_offers(url, headers):
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.text
+    else:
+        print(f"Error fetching job offers: HTTP {response.status_code}")
+        return None
+
+def parse_job_details(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    job_sections = soup.find_all('h2', class_='t4 media-heading')
+    job_data = []
+    for job_section in job_sections:
+        job_details = extract_job_information(job_section)
+        if job_details:
+            job_data.append(job_details)
+    return job_data
