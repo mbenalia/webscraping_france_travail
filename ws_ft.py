@@ -126,3 +126,9 @@ def nettoyage_total(df):
     df['contrat'] = nettoyer_contrat(df['contrat'])
     df["date_publication"] = df["date_publication"].apply(convert_to_date)
     return df
+
+def export_csv(dataframe, index=True):
+    date_str = datetime.today().strftime("%Y-%m-%d-%H_%M")
+    nom_fichier=f"france_travail_{date_str}.csv"
+    dataframe.to_csv(nom_fichier, index=index)
+    return f"exported to {nom_fichier}"
