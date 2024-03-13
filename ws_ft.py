@@ -39,3 +39,21 @@ def get_nombre_offres():
     else:
         print("Erreur lors de la récupération de la page : HTTP", response.status_code)
         return None
+
+def fetch_job_offers(url, headers):
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.text
+    else:
+        print(f"Error fetching job offers: HTTP {response.status_code}")
+        return None
+
+def parse_job_details(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    job_sections = soup.find_all('h2', class_='t4 media-heading')
+    job_data = []
+    for job_section in job_sections:
+        job_details = extract_job_information(job_section)
+        if job_details:
+            job_data.append(job_details)
+    return job_data
