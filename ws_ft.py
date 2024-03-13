@@ -99,3 +99,30 @@ def scrap_FT():
         get_offres(nb_max-nb_max%20,nb_max,job_list)
 
     return pd.DataFrame(job_list)
+
+def nettoyer_entreprise(df):
+    # Utilise une expression régulière pour supprimer les caractères précédents et le tiret avant le nombre
+    clean_df = df.str.split('\n').str[0]
+    return clean_df
+
+def nettoyer_contrat(df):
+    # Divise la colonne "Entreprise" en fonction du caractère "\n" et ne conserve que la première partie
+    clean_df = df.str.replace('\n','')
+    return clean_df
+
+def convert_to_date(duree):
+    if "aujourd'hui" in duree:
+        return datetime.now().strftime("%Y-%m-%d")
+    elif "hier" in duree:
+        return (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    elif "il y a plus de" in duree:
+        return (datetime.now() - timedelta(days=31)).strftime("%Y-%m-%d")
+    elif "il y a" in duree:
+        days_ago = int(duree.split()[4])
+        return (datetime.now() - timedelta(days=days_ago)).strftime("%Y-%m-%d")
+
+def nettoyage_total(df):
+    df['entreprise'] = nettoyer_entreprise(df['entreprise'])
+    df['contrat'] = nettoyer_contrat(df['contrat'])
+    df["date_publication"] = df["date_publication"].apply(convert_to_date)
+    return df
