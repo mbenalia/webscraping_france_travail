@@ -132,3 +132,29 @@ def export_csv(dataframe, index=True):
     nom_fichier=f"france_travail_{date_str}.csv"
     dataframe.to_csv(nom_fichier, index=index)
     return f"exported to {nom_fichier}"
+
+def conversion_df_bdd(df,connection=None):
+    if  connection == None:
+        connection = sqlite3.connect('ma_base.db')
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='offres'")
+    table_existe = cursor.fetchone() is not None
+    if not table_existe:
+        cursor.execute("""
+      CREATE TABLE offres (
+        poste TEXT NOT NULL,
+        entreprise TEXT NOT NULL,
+        lieu TEXT,
+        description TEXT,
+        contrat TEXT,
+        date_publication TEXT
+      )
+      """)
+    try:
+        data_to_insert = df[['poste', 'entreprise', 'lieu', 'description', 'contrat', 'date_publication']]
+        data_to_insert.to_sql('offres', connection, if_exists='append', index=False)
+
+        connection.commit()
+        connection.close()
+    except Exception as e:
+        print(f"Une erreur est survenue lors de l'insertion des données : {e}")
