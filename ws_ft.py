@@ -85,3 +85,17 @@ def parse_job_details(html_content):
         if job_details:
             job_data.append(job_details)
     return job_data
+
+def scrap_FT():
+    job_list=[]
+    nb_max=get_nombre_offres()
+    nb_max=41
+    for i in range(0,nb_max,20):
+        delai_attente = random.randint(1, 5)
+        #time.sleep(delai_attente)
+        get_offres(i, min(i+20, nb_max), job_list)
+
+    if nb_max % 20 != 0:
+        get_offres(nb_max-nb_max%20,nb_max,job_list)
+
+    return pd.DataFrame(job_list)
